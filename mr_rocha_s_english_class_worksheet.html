@@ -1,0 +1,1323 @@
+<!DOCTYPE html>
+<html lang="en" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mr. Rocha’s English Class: Gerunds and Infinitives</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Tailwind Config for Dark Mode -->
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            blue: '#3b82f6',
+                            glow: 'rgba(59, 130, 246, 0.6)'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Chart.js for graphs -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+        body {
+            font-family: 'Inter', sans-serif;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .shiny-blue {
+            border: 2px solid #3b82f6;
+            box-shadow: 0 0 10px 2px rgba(59, 130, 246, 0.5);
+            outline: none;
+            transition: all 0.3s ease;
+        }
+        .shiny-blue:focus {
+            box-shadow: 0 0 15px 4px rgba(59, 130, 246, 0.8);
+        }
+
+        .dnd-zone {
+            min-height: 40px;
+            min-width: 200px;
+            border: 2px dashed #9ca3af;
+            display: inline-block;
+            vertical-align: middle;
+            border-radius: 0.375rem;
+            padding: 0.25rem;
+            margin: 0 0.5rem;
+            background-color: rgba(156, 163, 175, 0.1);
+        }
+        .dnd-zone.drag-over {
+            border-color: #3b82f6;
+            background-color: rgba(59, 130, 246, 0.1);
+        }
+        
+        .dnd-item {
+            cursor: grab;
+            background-color: white;
+            border: 1px solid #d1d5db;
+            padding: 0.5rem;
+            border-radius: 0.25rem;
+            margin-bottom: 0.5rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            display: inline-block;
+            color: black;
+        }
+        .dark .dnd-item {
+            background-color: #374151;
+            border-color: #4b5563;
+            color: white;
+        }
+        .dnd-item:active {
+            cursor: grabbing;
+        }
+
+        /* Puzzle Styles */
+        #puzzle-container {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            grid-template-rows: repeat(4, 1fr);
+            gap: 2px;
+            width: 100%;
+            max-width: 600px;
+            aspect-ratio: 4 / 3;
+            background-color: #e5e7eb;
+            border: 2px solid #3b82f6;
+            margin: 0 auto;
+        }
+        .dark #puzzle-container { background-color: #374151; }
+        
+        .puzzle-slot {
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255,255,255,0.2);
+            border: 1px dashed #9ca3af;
+        }
+        
+        .puzzle-piece {
+            width: 100%;
+            height: 100%;
+            background-image: url('Image3.jpg');
+            background-size: 500% 400%; /* 5 cols, 4 rows */
+            cursor: grab;
+            box-shadow: inset 0 0 0 1px rgba(0,0,0,0.1);
+        }
+        
+        #puzzle-pieces-bank {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            min-height: 120px;
+            padding: 10px;
+            border: 2px dashed #9ca3af;
+            margin-top: 20px;
+        }
+        .puzzle-piece-container {
+            width: calc(20% - 4px);
+            aspect-ratio: 5 / 4;
+        }
+
+        /* Hide elements on print */
+        @media print {
+            .no-print { display: none !important; }
+            .print-only { display: block !important; }
+            body { background-color: white !important; color: black !important; }
+            canvas { max-width: 100% !important; }
+            .section-card { box-shadow: none !important; border: 1px solid #ccc; page-break-inside: avoid; }
+        }
+        
+        /* Correct/Incorrect animations */
+        .correct-answer { background-color: #dcfce7 !important; border-color: #22c55e !important; color: #166534 !important; }
+        .incorrect-answer { background-color: #fee2e2 !important; border-color: #ef4444 !important; color: #991b1b !important; }
+        .dark .correct-answer { background-color: rgba(34, 197, 94, 0.2) !important; color: #4ade80 !important; }
+        .dark .incorrect-answer { background-color: rgba(239, 68, 68, 0.2) !important; color: #f87171 !important; }
+
+        /* Lock state */
+        .locked { opacity: 0.7; pointer-events: none; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-900 dark:bg-gray-900 dark:text-gray-100 min-h-screen flex flex-col">
+
+    <!-- Header Navigation -->
+    <nav class="sticky top-0 z-50 bg-white dark:bg-gray-800 shadow-md no-print">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center space-x-3">
+                    <i class="fas fa-graduation-cap text-2xl text-blue-600 dark:text-blue-400"></i>
+                    <h1 class="text-lg md:text-xl font-bold truncate">Mr. Rocha’s English Class: Gerunds & Infinitives</h1>
+                </div>
+                <div class="flex items-center">
+                    <button id="theme-toggle" class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition">
+                        <i class="fas fa-moon text-gray-600 dark:text-gray-300" id="theme-icon"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Progress Bar -->
+            <div class="w-full bg-gray-200 dark:bg-gray-700 h-2">
+                <div id="progress-bar" class="bg-blue-600 h-2 transition-all duration-500 ease-in-out" style="width: 0%"></div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="flex-grow container mx-auto px-4 py-8 max-w-5xl">
+        
+        <!-- Student Info Header -->
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 mb-8 section-card">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label class="block text-sm font-medium mb-2">Student Name</label>
+                    <input type="text" id="student-name" placeholder="Enter your full name" class="w-full p-3 rounded-lg bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 shiny-blue text-gray-900 dark:text-white">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-2">Date</label>
+                    <input type="date" id="student-date" class="w-full p-3 rounded-lg bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 shiny-blue text-gray-900 dark:text-white">
+                </div>
+            </div>
+        </div>
+
+        <!-- Sections Container -->
+        <div id="sections-container">
+            
+            <!-- Intro Section (Index 0) -->
+            <section class="activity-section active" data-index="0">
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 mb-8 section-card">
+                    <h2 class="text-2xl font-bold text-blue-600 dark:text-blue-400 mb-4">Introduction</h2>
+                    <p class="mb-4 text-lg">Welcome to today's lesson on Gerunds and Infinitives. Please complete each activity carefully. Your progress will be saved as you move through the sections.</p>
+                    <div class="w-full max-w-2xl mx-auto rounded-xl overflow-hidden shadow-md">
+                        <img src="Image1.jpg" alt="Introductory Image" onerror="this.src='https://placehold.co/800x400/3b82f6/ffffff?text=Image1.jpg+Missing';" class="w-full h-auto object-cover">
+                    </div>
+                </div>
+            </section>
+
+            <!-- Activity 1 (Index 1) -->
+            <section class="activity-section hidden" data-index="1">
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 mb-8 section-card">
+                    <h2 class="text-2xl font-bold text-blue-600 dark:text-blue-400 mb-4">Activity 1: Reflection & Free Practice</h2>
+                    <p class="mb-6 font-medium">Answer the following questions thoughtfully. Pay attention to your use of gerunds and infinitives.</p>
+                    
+                    <div class="space-y-6" id="act1-container">
+                        <!-- Q1 -->
+                        <div>
+                            <label class="block mb-2 font-semibold">1. What activity do you enjoy doing most in your free time, and what makes it more satisfying than other activities?</label>
+                            <textarea rows="3" class="w-full p-3 rounded-lg bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 shiny-blue act1-input"></textarea>
+                        </div>
+                        <!-- Q2 -->
+                        <div>
+                            <label class="block mb-2 font-semibold">2. If you had to choose between spending a weekend with friends or staying home to work on a personal project, which would you prefer to do, and why?</label>
+                            <textarea rows="3" class="w-full p-3 rounded-lg bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 shiny-blue act1-input"></textarea>
+                        </div>
+                        <!-- Q3 -->
+                        <div>
+                            <label class="block mb-2 font-semibold">3. What is something you dislike doing but believe is important to continue doing? Explain your reasons.</label>
+                            <textarea rows="3" class="w-full p-3 rounded-lg bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 shiny-blue act1-input"></textarea>
+                        </div>
+                        <!-- Q4 -->
+                        <div>
+                            <label class="block mb-2 font-semibold">4. Is it better for teenagers to spend time developing one main talent or to try learning several different skills? Why?</label>
+                            <textarea rows="3" class="w-full p-3 rounded-lg bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 shiny-blue act1-input"></textarea>
+                        </div>
+                        <!-- Q5 -->
+                        <div>
+                            <label class="block mb-2 font-semibold">5. What hobby would you like to start doing in the future, and what might prevent you from trying it?</label>
+                            <textarea rows="3" class="w-full p-3 rounded-lg bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 shiny-blue act1-input"></textarea>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-6 flex justify-end no-print">
+                        <button onclick="checkAct1()" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-6 rounded-lg transition shadow-lg">Check Answers</button>
+                    </div>
+                    <div id="act1-feedback" class="mt-4 font-bold text-center hidden"></div>
+                </div>
+            </section>
+
+            <!-- Activity 2 (Index 2) -->
+            <section class="activity-section hidden" data-index="2">
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 mb-8 section-card">
+                    <h2 class="text-2xl font-bold text-blue-600 dark:text-blue-400 mb-4">Activity 2: Video Analysis</h2>
+                    <p class="mb-4">Watch the video and tell Mr. Rocha what you saw. Be ready to provide details and examples using gerunds and infinitives.</p>
+                    
+                    <div class="w-full aspect-video bg-black rounded-lg overflow-hidden shadow-lg mb-6 flex items-center justify-center relative">
+                         <!-- Fallback for missing local video -->
+                         <video controls class="w-full h-full object-cover z-10">
+                            <source src="Video1.mp4" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                        <div class="absolute text-white text-center z-0">
+                            <i class="fas fa-video fa-3x mb-2"></i>
+                            <p>Video1.mp4 Not Found locally.</p>
+                        </div>
+                    </div>
+
+                    <div id="act2-container">
+                        <label class="block mb-2 font-semibold">Your Notes & Observations:</label>
+                        <textarea rows="5" class="w-full p-3 rounded-lg bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 shiny-blue act2-input" placeholder="I noticed the speaker trying to explain..."></textarea>
+                    </div>
+                    
+                    <div class="mt-6 flex justify-end no-print">
+                        <button onclick="checkAct2()" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-6 rounded-lg transition shadow-lg">Check Answers</button>
+                    </div>
+                    <div id="act2-feedback" class="mt-4 font-bold text-center hidden"></div>
+                </div>
+            </section>
+
+            <!-- Activity 3 (Index 3) -->
+            <section class="activity-section hidden" data-index="3">
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 mb-8 section-card">
+                    <h2 class="text-2xl font-bold text-blue-600 dark:text-blue-400 mb-4">Activity 3: Reading & Interpretation</h2>
+                    <p class="mb-4">Read the story below. Tell Mr. Rocha what it is about in your own words.</p>
+                    
+                    <div class="w-full rounded-xl overflow-hidden shadow-md mb-6 bg-gray-200 dark:bg-gray-700">
+                        <img src="Image2.jpg" alt="Story Image" onerror="this.src='https://placehold.co/800x600/10b981/ffffff?text=Image2.jpg+(Story+Text)';" class="w-full h-auto object-contain">
+                    </div>
+
+                    <div id="act3-container">
+                        <label class="block mb-2 font-semibold">Summary & Analysis:</label>
+                        <textarea rows="5" class="w-full p-3 rounded-lg bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 shiny-blue act3-input" placeholder="The story is about..."></textarea>
+                    </div>
+
+                    <div class="mt-6 flex justify-end no-print">
+                        <button onclick="checkAct3()" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-6 rounded-lg transition shadow-lg">Check Answers</button>
+                    </div>
+                    <div id="act3-feedback" class="mt-4 font-bold text-center hidden"></div>
+                </div>
+            </section>
+
+            <!-- Activity 4 (Index 4) -->
+            <section class="activity-section hidden" data-index="4">
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 mb-8 section-card">
+                    <h2 class="text-2xl font-bold text-blue-600 dark:text-blue-400 mb-4">Activity 4: Grammar Guide & Cloze Exercise</h2>
+                    
+                    <div class="mb-8 p-6 bg-blue-50 dark:bg-blue-900/30 rounded-lg border-l-4 border-blue-500">
+                        <h3 class="text-xl font-bold mb-3">Understanding Gerunds and Infinitives</h3>
+                        <p class="mb-3">A <strong>gerund</strong> is a verb form ending in <em>-ing</em> that acts as a noun (e.g., swimming, eating). An <strong>infinitive</strong> is the base form of a verb preceded by <em>to</em> (e.g., to swim, to eat).</p>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 text-sm">
+                            <div>
+                                <h4 class="font-bold text-blue-700 dark:text-blue-300">15 Verbs followed by Gerunds:</h4>
+                                <p>admit, avoid, consider, delay, deny, discuss, enjoy, finish, imagine, involve, keep, miss, postpone, practice, recommend.</p>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-blue-700 dark:text-blue-300">15 Verbs followed by Infinitives:</h4>
+                                <p>agree, appear, arrange, ask, decide, demand, expect, fail, hope, intend, learn, manage, offer, plan, pretend.</p>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-blue-700 dark:text-blue-300">8 Verbs followed by Both (no meaning change):</h4>
+                                <p>begin, start, continue, like, love, hate, prefer, bother.</p>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-blue-700 dark:text-blue-300">10 Prepositions followed by Gerunds:</h4>
+                                <p>about, after, against, before, by, for, in, instead of, on, without.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <h3 class="text-lg font-bold mb-4">Cloze Exercise</h3>
+                    <p class="mb-4">Complete the 15 sentences by typing the correct form (gerund or infinitive) of the verb in parentheses.</p>
+                    
+                    <div class="space-y-4" id="act4-container">
+                        <!-- Generated via JS for cleaner HTML -->
+                    </div>
+
+                    <div class="mt-6 flex justify-end no-print">
+                        <button onclick="checkAct4()" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-6 rounded-lg transition shadow-lg">Check Answers</button>
+                    </div>
+                    <div id="act4-feedback" class="mt-4 font-bold text-center hidden"></div>
+                </div>
+            </section>
+
+            <!-- Activity 5 (Index 5) -->
+            <section class="activity-section hidden" data-index="5">
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 mb-8 section-card">
+                    <h2 class="text-2xl font-bold text-blue-600 dark:text-blue-400 mb-4">Activity 5: Reading Comprehension (B2 Level)</h2>
+                    
+                    <div class="mb-6 p-4 bg-gray-100 dark:bg-gray-700 rounded-lg">
+                        <h3 class="font-bold mb-2">Key Vocabulary:</h3>
+                        <ul class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm">
+                            <li><strong>Vibrant:</strong> Full of energy and enthusiasm.</li>
+                            <li><strong>Wander:</strong> To walk around slowly in a relaxed way.</li>
+                            <li><strong>Gastronomy:</strong> The practice or art of choosing, cooking, and eating good food.</li>
+                            <li><strong>Excursion:</strong> A short journey or trip.</li>
+                            <li><strong>Thriving:</strong> Prosperous and growing; flourishing.</li>
+                            <li><strong>Immerse:</strong> Involve oneself deeply in a particular activity or interest.</li>
+                            <li><strong>Contemporary:</strong> Belonging to or occurring in the present.</li>
+                            <li><strong>Unwind:</strong> Relax after a period of work or tension.</li>
+                            <li><strong>Bustling:</strong> Full of energetic and noisy activity.</li>
+                            <li><strong>Picturesque:</strong> Visually attractive, especially in a quaint or pretty style.</li>
+                        </ul>
+                    </div>
+
+                    <h3 class="text-lg font-bold mb-4">Drag and Drop Text Completion</h3>
+                    <p class="mb-4">Drag the sentences from the bank below and drop them into the correct blanks in the text.</p>
+                    
+                    <!-- Sentence Bank -->
+                    <div id="sentence-bank" class="mb-6 p-4 border-2 border-gray-300 dark:border-gray-600 rounded-lg min-h-[100px] flex flex-col gap-2 bg-gray-50 dark:bg-gray-800" ondragover="allowDrop(event)" ondrop="drop(event, 'bank')">
+                        <!-- Draggables generated via JS -->
+                    </div>
+
+                    <!-- Text with Drop Zones -->
+                    <div class="leading-loose text-justify text-lg mb-8 p-6 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-inner" id="act5-text">
+                        Living in Guadalajara as a male teenager offers countless opportunities to enjoy a vibrant weekend. To begin with, many teens decide <span class="dnd-zone" data-correct="A" ondragover="allowDrop(event)" ondrop="drop(event, 'zone1')"></span> early on Saturday mornings to beat the crowds. You can't avoid <span class="dnd-zone" data-correct="B" ondragover="allowDrop(event)" ondrop="drop(event, 'zone2')"></span> while walking through the historic center, soaking in the picturesque architecture. 
+                        <br><br>
+                        For those interested in sports, organizing a football match with friends at a local park is a must. If you prefer <span class="dnd-zone" data-correct="C" ondragover="allowDrop(event)" ondrop="drop(event, 'zone3')"></span>, you might consider visiting one of the thriving modern malls in Zapopan. It's easy to spend hours wandering around and looking at contemporary fashion.
+                        <br><br>
+                        Later in the afternoon, it's typical to crave some local gastronomy. You should definitely try <span class="dnd-zone" data-correct="D" ondragover="allowDrop(event)" ondrop="drop(event, 'zone4')"></span> at a bustling street stand; it's a true staple of the city. Finally, after a long day of excursions, teenagers usually need <span class="dnd-zone" data-correct="E" ondragover="allowDrop(event)" ondrop="drop(event, 'zone5')"></span> before starting a new week of school.
+                    </div>
+
+                    <!-- Multiple Choice Questions -->
+                    <h3 class="text-lg font-bold mb-4 border-t pt-6">Multiple Choice Comprehension</h3>
+                    <div id="act5-mcq-container" class="space-y-6">
+                        <!-- Generated via JS -->
+                    </div>
+
+                    <div class="mt-6 flex justify-end no-print">
+                        <button onclick="checkAct5()" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-6 rounded-lg transition shadow-lg">Check Answers</button>
+                    </div>
+                    <div id="act5-feedback" class="mt-4 font-bold text-center hidden"></div>
+                </div>
+            </section>
+
+            <!-- Activity 6 (Index 6) -->
+            <section class="activity-section hidden" data-index="6">
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 mb-8 section-card">
+                    <h2 class="text-2xl font-bold text-blue-600 dark:text-blue-400 mb-4">Activity 6: Listening Dictation</h2>
+                    <p class="mb-4">Listen to the boy talking about the things he does on the weekend. Write down the things he says, paying close attention to gerunds and infinitives.</p>
+                    
+                    <div class="mb-6 p-4 bg-gray-100 dark:bg-gray-700 rounded-lg flex items-center justify-center">
+                        <audio controls class="w-full max-w-md">
+                            <source src="Audio1.mp3" type="audio/mpeg">
+                            Your browser does not support the audio element.
+                        </audio>
+                    </div>
+                    <p class="text-xs text-center mb-4 italic">Note: If Audio1.mp3 is missing, imagine a track about weekend hobbies.</p>
+
+                    <div id="act6-container">
+                        <label class="block mb-2 font-semibold">Your Transcript / Notes:</label>
+                        <textarea rows="6" class="w-full p-3 rounded-lg bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 shiny-blue act6-input" placeholder="Type what you hear..."></textarea>
+                    </div>
+
+                    <div class="mt-6 flex justify-end no-print">
+                        <button onclick="checkAct6()" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-6 rounded-lg transition shadow-lg">Check Answers</button>
+                    </div>
+                    <div id="act6-feedback" class="mt-4 font-bold text-center hidden"></div>
+                </div>
+            </section>
+
+            <!-- Activity 7 (Index 7) -->
+            <section class="activity-section hidden" data-index="7">
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 mb-8 section-card">
+                    <h2 class="text-2xl font-bold text-blue-600 dark:text-blue-400 mb-4">Activity 7: Image Puzzle</h2>
+                    <p class="mb-4">Drag and drop each part of Image3 to form the complete image. Click Start to begin the timer.</p>
+                    
+                    <div class="flex flex-col md:flex-row gap-6 mb-6">
+                        <!-- Target Image -->
+                        <div class="w-full md:w-1/3">
+                            <h4 class="font-bold mb-2 text-center">Target Image</h4>
+                            <div class="border-4 border-gray-300 rounded-lg overflow-hidden shadow-sm aspect-[4/3] bg-gray-200 flex items-center justify-center">
+                                <img src="Image3.jpg" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';" class="w-full h-full object-cover">
+                                <div style="display:none;" class="text-center p-4">Image3.jpg Missing.<br>Visual puzzle disabled.</div>
+                            </div>
+                        </div>
+                        
+                        <!-- Controls & Timer -->
+                        <div class="w-full md:w-2/3 flex flex-col items-center justify-center bg-gray-50 dark:bg-gray-700 rounded-xl p-4 shadow-inner">
+                            <div class="text-4xl font-mono font-bold mb-4 text-blue-600 dark:text-blue-400" id="puzzle-timer">00:00</div>
+                            <div class="space-x-4 no-print">
+                                <button onclick="startPuzzle()" id="btn-start-puzzle" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg transition shadow">Start Puzzle</button>
+                                <button onclick="resetPuzzle()" id="btn-reset-puzzle" class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-6 rounded-lg transition shadow" disabled>Restart</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Puzzle Grid (Drop Zones) -->
+                    <div id="act7-container" class="locked relative">
+                        <div id="puzzle-overlay" class="absolute inset-0 bg-white/70 dark:bg-black/70 z-10 flex items-center justify-center font-bold text-2xl">Click Start to Play</div>
+                        <div id="puzzle-container">
+                            <!-- 20 slots generated via JS -->
+                        </div>
+                    </div>
+
+                    <div class="mt-6 flex justify-end no-print">
+                        <button onclick="checkAct7()" id="btn-check-puzzle" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-6 rounded-lg transition shadow-lg" disabled>Check Puzzle Completion</button>
+                    </div>
+                    <div id="act7-feedback" class="mt-4 font-bold text-center hidden"></div>
+                </div>
+            </section>
+
+            <!-- Activity 8 (Index 8) -->
+            <section class="activity-section hidden" data-index="8">
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 mb-8 section-card">
+                    <h2 class="text-2xl font-bold text-blue-600 dark:text-blue-400 mb-4">Activity 8: Creative Writing</h2>
+                    <p class="mb-4">Write 12 complex sentences about weekend activities for teens (B2 level). Use gerunds and infinitives appropriately.</p>
+                    
+                    <div class="mb-6 p-6 bg-blue-50 dark:bg-blue-900/30 rounded-lg border-l-4 border-blue-500">
+                        <h3 class="text-lg font-bold mb-3">Reference Guide</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm mb-4">
+                            <div>
+                                <h4 class="font-bold text-blue-700 dark:text-blue-300">12 Verbs followed by Gerunds:</h4>
+                                <p>admit, avoid, consider, deny, enjoy, finish, imagine, involve, keep, miss, postpone, practice.</p>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-blue-700 dark:text-blue-300">12 Verbs followed by Infinitives:</h4>
+                                <p>agree, decide, expect, hope, intend, learn, manage, offer, plan, pretend, promise, refuse.</p>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-blue-700 dark:text-blue-300">Prepositions followed by Gerunds:</h4>
+                                <p>about, after, before, by, for, in, on, without.</p>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-blue-700 dark:text-blue-300">6 Verbs followed by Both:</h4>
+                                <p>begin, continue, hate, like, love, start.</p>
+                            </div>
+                        </div>
+                        <div class="bg-yellow-50 dark:bg-yellow-900/30 border-l-4 border-yellow-400 p-3 rounded">
+                            <strong>Sample Sentences:</strong><br>
+                            1. <em>Despite wanting to stay home, I ended up going to the cinema with my friends.</em><br>
+                            2. <em>To improve my skills, I practice playing the guitar every Saturday morning before doing my chores.</em>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="act8-container">
+                        <!-- Textareas generated via JS -->
+                    </div>
+
+                    <div class="mt-6 flex justify-end no-print">
+                        <button onclick="checkAct8()" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-6 rounded-lg transition shadow-lg">Check Answers</button>
+                    </div>
+                    <div id="act8-feedback" class="mt-4 font-bold text-center hidden"></div>
+                </div>
+            </section>
+
+            <!-- Results Section (Index 9) -->
+            <section class="activity-section hidden print-only" data-index="9">
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 mb-8 section-card">
+                    <h2 class="text-3xl font-bold text-center text-blue-600 dark:text-blue-400 mb-8 border-b pb-4">Final Results & Feedback</h2>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+                        <!-- Charts -->
+                        <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-xl shadow-inner flex flex-col items-center">
+                            <h3 class="font-bold text-lg mb-4 text-center">Activity Completion Breakdown</h3>
+                            <div class="w-full max-w-[300px] aspect-square relative">
+                                <canvas id="chart-pie"></canvas>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-xl shadow-inner">
+                            <h3 class="font-bold text-lg mb-4 text-center">Score per Graded Section</h3>
+                            <div class="w-full h-64">
+                                <canvas id="chart-bar"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Overall Score & Info -->
+                    <div class="text-center mb-8 p-6 bg-blue-50 dark:bg-blue-900/20 rounded-xl border border-blue-200 dark:border-blue-800">
+                        <h3 class="text-2xl font-bold mb-2">Overall Score: <span id="final-score" class="text-blue-600 dark:text-blue-400 text-4xl">0%</span></h3>
+                        <p id="final-feedback-text" class="text-lg italic mt-2"></p>
+                    </div>
+
+                    <!-- 8 Specific Recommendations -->
+                    <h3 class="text-xl font-bold mb-4 text-brand-blue border-b pb-2">8 Specific Recommendations for You:</h3>
+                    <ul id="recommendations-list" class="space-y-3 list-disc list-inside text-lg bg-gray-50 dark:bg-gray-700 p-6 rounded-xl shadow-inner">
+                        <!-- Populated by JS -->
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Navigation Buttons -->
+            <div class="flex justify-between items-center mt-8 pb-12 no-print">
+                <button id="btn-prev" onclick="navigate(-1)" class="bg-gray-300 hover:bg-gray-400 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-200 font-bold py-3 px-6 rounded-lg transition shadow disabled:opacity-50 disabled:cursor-not-allowed">
+                    <i class="fas fa-chevron-left mr-2"></i> Previous
+                </button>
+                
+                <button id="btn-submit" onclick="submitWorksheet()" class="hidden bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-8 rounded-xl transition shadow-xl transform hover:scale-105">
+                    Submit Worksheet <i class="fas fa-paper-plane ml-2"></i>
+                </button>
+                
+                <button id="btn-print" onclick="printResults()" class="hidden bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-xl transition shadow-xl">
+                    Print Results <i class="fas fa-print ml-2"></i>
+                </button>
+
+                <button id="btn-next" onclick="navigate(1)" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg transition shadow">
+                    Next <i class="fas fa-chevron-right ml-2"></i>
+                </button>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- JavaScript Logic -->
+    <script>
+        // --- State Management ---
+        const totalSections = 10; // 0:Intro, 1-8:Acts, 9:Results
+        let currentSection = 0;
+        
+        let scores = {
+            act1: { completed: false, score: 0, total: 5 }, // Open ended, 1 pt per filled box
+            act2: { completed: false, score: 0, total: 1 },
+            act3: { completed: false, score: 0, total: 1 },
+            act4: { completed: false, score: 0, total: 15 }, // Cloze
+            act5: { completed: false, score: 0, total: 11 }, // DND(5) + MCQ(6)
+            act6: { completed: false, score: 0, total: 1 },
+            act7: { completed: false, score: 0, total: 20 }, // Puzzle pieces
+            act8: { completed: false, score: 0, total: 12 }, // Sentences
+        };
+
+        // --- Initialization ---
+        document.addEventListener('DOMContentLoaded', () => {
+            initTheme();
+            generateAct4();
+            generateAct5DND();
+            generateAct5MCQ();
+            generateAct8();
+            initPuzzle();
+            updateNavigation();
+            
+            // Allow checking results anytime
+            document.getElementById('btn-submit').classList.remove('hidden');
+        });
+
+        // --- Theme Toggle ---
+        function initTheme() {
+            const toggleBtn = document.getElementById('theme-toggle');
+            const html = document.documentElement;
+            const icon = document.getElementById('theme-icon');
+
+            toggleBtn.addEventListener('click', () => {
+                html.classList.toggle('dark');
+                if (html.classList.contains('dark')) {
+                    icon.classList.remove('fa-moon');
+                    icon.classList.add('fa-sun');
+                    icon.classList.replace('text-gray-600', 'text-yellow-400');
+                } else {
+                    icon.classList.add('fa-moon');
+                    icon.classList.remove('fa-sun');
+                    icon.classList.replace('text-yellow-400', 'text-gray-600');
+                }
+                updateChartsTheme();
+            });
+        }
+
+        // --- Navigation ---
+        function navigate(direction) {
+            const sections = document.querySelectorAll('.activity-section');
+            sections[currentSection].classList.add('hidden');
+            sections[currentSection].classList.remove('active');
+            
+            currentSection += direction;
+            
+            if (currentSection < 0) currentSection = 0;
+            if (currentSection >= totalSections) currentSection = totalSections - 1;
+            
+            sections[currentSection].classList.remove('hidden');
+            sections[currentSection].classList.add('active');
+            
+            updateNavigation();
+            updateProgressBar();
+            
+            // Scroll to top
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            
+            // If navigating to results, auto-calculate if not already done
+            if(currentSection === 9) {
+                renderResults();
+            }
+        }
+
+        function updateNavigation() {
+            const btnPrev = document.getElementById('btn-prev');
+            const btnNext = document.getElementById('btn-next');
+            const btnSubmit = document.getElementById('btn-submit');
+            const btnPrint = document.getElementById('btn-print');
+
+            btnPrev.disabled = currentSection === 0;
+            
+            if (currentSection === totalSections - 1) { // Results page
+                btnNext.classList.add('hidden');
+                btnSubmit.classList.add('hidden');
+                btnPrint.classList.remove('hidden');
+            } else {
+                btnNext.classList.remove('hidden');
+                btnPrint.classList.add('hidden');
+                // Always show submit to allow early submission, unless on results
+                btnSubmit.classList.remove('hidden');
+            }
+        }
+
+        function updateProgressBar() {
+            // Calculate based on checked activities, not just navigation
+            let completed = 0;
+            for(let act in scores) { if(scores[act].completed) completed++; }
+            let pct = (completed / 8) * 100;
+            
+            // Override with navigation if they are just browsing
+            let navPct = (currentSection / (totalSections - 1)) * 100;
+            
+            document.getElementById('progress-bar').style.width = Math.max(pct, navPct) + '%';
+        }
+
+        // --- Activity Generators & Logic ---
+
+        // Helper to lock a container
+        function lockContainer(id, btnElement) {
+            const container = document.getElementById(id);
+            container.classList.add('locked');
+            if(btnElement) btnElement.disabled = true;
+        }
+
+        // Act 1
+        function checkAct1() {
+            if(scores.act1.completed) return;
+            const inputs = document.querySelectorAll('.act1-input');
+            let filled = 0;
+            inputs.forEach(input => {
+                if(input.value.trim().length > 10) filled++;
+                input.readOnly = true;
+                input.classList.remove('shiny-blue');
+            });
+            scores.act1.score = filled;
+            scores.act1.completed = true;
+            
+            const fb = document.getElementById('act1-feedback');
+            fb.textContent = `Saved! You provided detailed answers for ${filled}/5 questions.`;
+            fb.classList.remove('hidden');
+            fb.classList.add('text-blue-600', 'dark:text-blue-400');
+            lockContainer('act1-container', event.target);
+            updateProgressBar();
+        }
+
+        // Act 2 & 3 & 6 (Open text)
+        function checkGenericTextAct(actNum, inputClass, containerId) {
+            if(scores[`act${actNum}`].completed) return;
+            const input = document.querySelector(`.${inputClass}`);
+            let score = input.value.trim().length > 15 ? 1 : 0;
+            scores[`act${actNum}`].score = score;
+            scores[`act${actNum}`].completed = true;
+            
+            input.readOnly = true;
+            input.classList.remove('shiny-blue');
+            
+            const fb = document.getElementById(`act${actNum}-feedback`);
+            fb.textContent = score ? "Saved! Excellent response." : "Saved! Please provide more detail next time.";
+            fb.classList.remove('hidden');
+            fb.classList.add('text-blue-600', 'dark:text-blue-400');
+            lockContainer(containerId, event.target);
+            updateProgressBar();
+        }
+        function checkAct2() { checkGenericTextAct(2, 'act2-input', 'act2-container'); }
+        function checkAct3() { checkGenericTextAct(3, 'act3-input', 'act3-container'); }
+        function checkAct6() { checkGenericTextAct(6, 'act6-input', 'act6-container'); }
+
+        // Act 4: Cloze
+        const act4Data = [
+            { q: "I avoid (go) ___ to the mall on weekends because it's too crowded.", a: "going" },
+            { q: "She agreed (help) ___ me with my English homework.", a: "to help" },
+            { q: "Do you enjoy (watch) ___ movies online?", a: "watching" },
+            { q: "They decided (start) ___ a new business.", a: "to start" },
+            { q: "He misses (play) ___ basketball with his old friends.", a: "playing" },
+            { q: "I hope (see) ___ you at the party tonight.", a: "to see" },
+            { q: "She is thinking about (move) ___ to Canada.", a: "moving" },
+            { q: "We managed (finish) ___ the project on time.", a: "to finish" },
+            { q: "I can't imagine (live) ___ without internet.", a: "living" },
+            { q: "He pretended (be) ___ asleep when his mom came in.", a: "to be" },
+            { q: "Keep (practice) ___ and you will get better.", a: "practicing" },
+            { q: "They plan (visit) ___ Europe next summer.", a: "to visit" },
+            { q: "I am tired of (wait) ___ for the bus.", a: "waiting" },
+            { q: "She refused (answer) ___ the question.", a: "to answer" },
+            { q: "He admitted (steal) ___ the money.", a: "stealing" }
+        ];
+
+        function generateAct4() {
+            const container = document.getElementById('act4-container');
+            act4Data.forEach((item, index) => {
+                let parts = item.q.split('___');
+                container.innerHTML += `
+                    <div class="flex items-center gap-2 mb-2 p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-800 transition">
+                        <span class="font-bold">${index+1}.</span>
+                        <span>${parts[0]}</span>
+                        <input type="text" class="act4-input border-b-2 border-blue-500 bg-transparent outline-none px-2 w-32 text-center" data-answer="${item.a}">
+                        <span>${parts[1]}</span>
+                        <i class="ml-2 act4-icon hidden"></i>
+                    </div>
+                `;
+            });
+        }
+
+        function checkAct4() {
+            if(scores.act4.completed) return;
+            const inputs = document.querySelectorAll('.act4-input');
+            const icons = document.querySelectorAll('.act4-icon');
+            let correct = 0;
+            
+            inputs.forEach((input, i) => {
+                let userAns = input.value.trim().toLowerCase();
+                let correctAns = input.getAttribute('data-answer');
+                input.readOnly = true;
+                
+                icons[i].classList.remove('hidden');
+                if(userAns === correctAns) {
+                    correct++;
+                    input.classList.add('correct-answer', 'border-green-500');
+                    icons[i].className = 'fas fa-check text-green-500 ml-2 act4-icon';
+                } else {
+                    input.classList.add('incorrect-answer', 'border-red-500');
+                    input.value = userAns + ` (${correctAns})`; // Show correct answer
+                    icons[i].className = 'fas fa-times text-red-500 ml-2 act4-icon';
+                }
+            });
+            
+            scores.act4.score = correct;
+            scores.act4.completed = true;
+            
+            const fb = document.getElementById('act4-feedback');
+            fb.textContent = `You scored ${correct} out of 15.`;
+            fb.classList.remove('hidden');
+            fb.classList.add(correct > 10 ? 'text-green-600' : 'text-orange-500');
+            lockContainer('act4-container', event.target);
+            updateProgressBar();
+        }
+
+        // Act 5: DND & MCQ
+        const act5Sentences = [
+            { id: "A", text: "to wake up" },
+            { id: "B", text: "feeling amazed" },
+            { id: "C", text: "to escape the heat" },
+            { id: "D", text: "eating some tortas ahogadas" },
+            { id: "E", text: "to rest completely" }
+        ];
+
+        const act5MCQs = [
+            { q: "What is the main topic of the text?", opts: ["Weekend activities for teens in Guadalajara", "The history of tortas ahogadas", "How to study on weekends", "Traffic problems in Zapopan"], a: 0 },
+            { q: "Why do teenagers wake up early on Saturdays?", opts: ["To beat the crowds", "To go to school", "To watch TV", "To avoid the heat"], a: 0 },
+            { q: "Where can you soak in picturesque architecture?", opts: ["In the historic center", "At the modern malls", "At home", "On a football pitch"], a: 0 },
+            { q: "What activity is suggested for sports enthusiasts?", opts: ["A football match", "Shopping", "Eating street food", "Waking up late"], a: 0 },
+            { q: "What is a 'staple' of the city mentioned in the text?", opts: ["Tortas ahogadas", "Modern malls", "Historic centers", "Excursions"], a: 0 },
+            { q: "What do teenagers need after a long day of excursions?", opts: ["To rest completely", "To do homework", "To eat more", "To wake up early"], a: 0 }
+        ];
+
+        // Drag and Drop Logic
+        function generateAct5DND() {
+            const bank = document.getElementById('sentence-bank');
+            // Shuffle sentences
+            let shuffled = [...act5Sentences].sort(() => Math.random() - 0.5);
+            shuffled.forEach(s => {
+                bank.innerHTML += `<div class="dnd-item" draggable="true" ondragstart="drag(event)" id="drag-${s.id}" data-id="${s.id}">${s.text}</div>`;
+            });
+        }
+
+        function allowDrop(ev) {
+            ev.preventDefault();
+            if(ev.target.classList.contains('dnd-zone') || ev.target.id === 'sentence-bank') {
+                ev.target.classList.add('drag-over');
+            }
+        }
+
+        function drag(ev) {
+            ev.dataTransfer.setData("text", ev.target.id);
+        }
+
+        function drop(ev, targetId) {
+            ev.preventDefault();
+            document.querySelectorAll('.dnd-zone, #sentence-bank').forEach(el => el.classList.remove('drag-over'));
+            
+            var data = ev.dataTransfer.getData("text");
+            var draggedEl = document.getElementById(data);
+            
+            if(!draggedEl) return;
+
+            // If dropping into a zone
+            if (ev.target.classList.contains('dnd-zone')) {
+                // If zone already has an item, move it back to bank
+                if (ev.target.children.length > 0) {
+                    document.getElementById('sentence-bank').appendChild(ev.target.children[0]);
+                }
+                ev.target.appendChild(draggedEl);
+            } 
+            // If dropping back to bank
+            else if (ev.target.id === 'sentence-bank' || ev.target.closest('#sentence-bank')) {
+                document.getElementById('sentence-bank').appendChild(draggedEl);
+            }
+        }
+        
+        // Remove drag-over styling when leaving
+        document.addEventListener('dragleave', (ev) => {
+            if(ev.target.classList && ev.target.classList.contains('dnd-zone')) {
+                ev.target.classList.remove('drag-over');
+            }
+        });
+
+        function generateAct5MCQ() {
+            const container = document.getElementById('act5-mcq-container');
+            act5MCQs.forEach((item, index) => {
+                let optsHTML = '';
+                // Shuffle options while keeping track of correct one
+                let options = item.opts.map((opt, i) => ({text: opt, isCorrect: i === item.a}));
+                options.sort(() => Math.random() - 0.5);
+                
+                options.forEach((opt, i) => {
+                    optsHTML += `
+                        <label class="flex items-center space-x-3 p-3 rounded-lg border border-gray-200 dark:border-gray-600 hover:bg-blue-50 dark:hover:bg-gray-700 cursor-pointer transition act5-mcq-label-${index}">
+                            <input type="radio" name="mcq-${index}" value="${opt.isCorrect}" class="form-radio text-blue-600 h-5 w-5 act5-radio">
+                            <span>${opt.text}</span>
+                        </label>
+                    `;
+                });
+                
+                container.innerHTML += `
+                    <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm border border-gray-100 dark:border-gray-700">
+                        <p class="font-bold mb-3">${index+1}. ${item.q}</p>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            ${optsHTML}
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function checkAct5() {
+            if(scores.act5.completed) return;
+            let score = 0;
+            
+            // Check DND
+            const zones = document.querySelectorAll('.dnd-zone');
+            zones.forEach(zone => {
+                let correctId = zone.getAttribute('data-correct');
+                let child = zone.firstElementChild;
+                if(child) {
+                    if(child.getAttribute('data-id') === correctId) {
+                        score++;
+                        child.classList.add('correct-answer');
+                    } else {
+                        child.classList.add('incorrect-answer');
+                        // Show correct answer hint
+                        let correctText = act5Sentences.find(s => s.id === correctId).text;
+                        zone.innerHTML += `<span class="text-xs text-red-500 ml-2">(Expected: ${correctText})</span>`;
+                    }
+                    child.draggable = false;
+                }
+            });
+            document.querySelectorAll('.dnd-item').forEach(el => el.draggable = false);
+
+            // Check MCQ
+            act5MCQs.forEach((item, index) => {
+                const selected = document.querySelector(`input[name="mcq-${index}"]:checked`);
+                const labels = document.querySelectorAll(`.act5-mcq-label-${index}`);
+                
+                // Disable inputs
+                document.querySelectorAll(`input[name="mcq-${index}"]`).forEach(inp => inp.disabled = true);
+                
+                if(selected) {
+                    if(selected.value === "true") {
+                        score++;
+                        selected.closest('label').classList.add('correct-answer');
+                    } else {
+                        selected.closest('label').classList.add('incorrect-answer');
+                        // highlight correct
+                        document.querySelector(`input[name="mcq-${index}"][value="true"]`).closest('label').classList.add('border-green-500', 'border-2');
+                    }
+                } else {
+                     // highlight correct if missed
+                     document.querySelector(`input[name="mcq-${index}"][value="true"]`).closest('label').classList.add('border-green-500', 'border-2');
+                }
+            });
+
+            scores.act5.score = score;
+            scores.act5.completed = true;
+            
+            const fb = document.getElementById('act5-feedback');
+            fb.textContent = `You scored ${score} out of 11.`;
+            fb.classList.remove('hidden');
+            fb.classList.add(score > 7 ? 'text-green-600' : 'text-orange-500');
+            
+            event.target.disabled = true;
+            updateProgressBar();
+        }
+
+        // Act 7: Puzzle
+        let puzzleTimer;
+        let puzzleSeconds = 0;
+        let puzzleActive = false;
+
+        function initPuzzle() {
+            const container = document.getElementById('puzzle-container');
+            container.innerHTML = '';
+            
+            // Create pieces
+            let pieces = [];
+            for(let r=0; r<4; r++) {
+                for(let c=0; c<5; c++) {
+                    let i = r*5 + c;
+                    pieces.push({
+                        id: `piece-${i}`,
+                        posX: c * 25,
+                        posY: r * 33.333,
+                        correctSlot: i
+                    });
+                }
+            }
+            
+            // Shuffle pieces
+            pieces.sort(() => Math.random() - 0.5);
+            
+            // Generate slots with scrambled pieces directly inside them
+            let htmlStr = '';
+            for(let i=0; i<20; i++) {
+                let p = pieces[i];
+                let pieceHtml = `<div class="puzzle-piece" draggable="false" id="${p.id}" data-correct="${p.correctSlot}" style="background-position: ${p.posX}% ${p.posY}%;" ondragstart="dragPuzzle(event)"></div>`;
+                htmlStr += `<div class="puzzle-slot" data-slot="${i}" ondragover="allowDropPuzzle(event)" ondrop="dropPuzzle(event)">${pieceHtml}</div>`;
+            }
+            container.innerHTML = htmlStr;
+        }
+
+        function startPuzzle() {
+            if(puzzleActive || scores.act7.completed) return;
+            puzzleActive = true;
+            document.getElementById('puzzle-overlay').style.display = 'none';
+            document.getElementById('btn-start-puzzle').disabled = true;
+            document.getElementById('btn-reset-puzzle').disabled = false;
+            document.getElementById('btn-check-puzzle').disabled = false;
+            document.getElementById('act7-container').classList.remove('locked');
+            
+            // Enable dragging
+            document.querySelectorAll('.puzzle-piece').forEach(p => p.draggable = true);
+            
+            // Start timer
+            puzzleTimer = setInterval(() => {
+                puzzleSeconds++;
+                let m = Math.floor(puzzleSeconds / 60).toString().padStart(2, '0');
+                let s = (puzzleSeconds % 60).toString().padStart(2, '0');
+                document.getElementById('puzzle-timer').textContent = `${m}:${s}`;
+            }, 1000);
+        }
+
+        function resetPuzzle() {
+            clearInterval(puzzleTimer);
+            puzzleSeconds = 0;
+            document.getElementById('puzzle-timer').textContent = "00:00";
+            puzzleActive = false;
+            document.getElementById('btn-start-puzzle').disabled = false;
+            document.getElementById('puzzle-overlay').style.display = 'flex';
+            document.getElementById('act7-container').classList.add('locked');
+            initPuzzle();
+        }
+
+        function allowDropPuzzle(ev) { ev.preventDefault(); }
+        function dragPuzzle(ev) { ev.dataTransfer.setData("text", ev.target.id); }
+        function dropPuzzle(ev) {
+            ev.preventDefault();
+            var data = ev.dataTransfer.getData("text");
+            var draggedEl = document.getElementById(data);
+            if(!draggedEl) return;
+
+            let targetSlot = ev.target;
+            
+            // If dropping on another piece, swap them
+            if (targetSlot.classList.contains('puzzle-piece')) {
+                let parent = targetSlot.parentNode;
+                let draggedParent = draggedEl.parentNode;
+                parent.appendChild(draggedEl);
+                draggedParent.appendChild(targetSlot);
+            } 
+            // If dropping on an empty slot
+            else if (targetSlot.classList.contains('puzzle-slot')) {
+                targetSlot.appendChild(draggedEl);
+            }
+        }
+
+        function checkAct7() {
+            if(scores.act7.completed || !puzzleActive) return;
+            clearInterval(puzzleTimer);
+            puzzleActive = false;
+            
+            let correct = 0;
+            const slots = document.querySelectorAll('.puzzle-slot');
+            slots.forEach(slot => {
+                let slotId = slot.getAttribute('data-slot');
+                let piece = slot.firstElementChild;
+                if(piece) {
+                    if(piece.getAttribute('data-correct') === slotId) {
+                        correct++;
+                        piece.style.border = "2px solid #22c55e"; // Green border for correct
+                    } else {
+                        piece.style.border = "2px solid #ef4444"; // Red for wrong
+                    }
+                    piece.draggable = false;
+                }
+            });
+
+            scores.act7.score = correct;
+            scores.act7.completed = true;
+            
+            document.querySelectorAll('.puzzle-piece').forEach(p => p.draggable = false);
+            
+            const fb = document.getElementById('act7-feedback');
+            fb.textContent = `You placed ${correct} out of 20 pieces correctly in ${document.getElementById('puzzle-timer').textContent}.`;
+            fb.classList.remove('hidden');
+            fb.classList.add(correct === 20 ? 'text-green-600' : 'text-orange-500');
+            
+            document.getElementById('btn-reset-puzzle').disabled = true;
+            document.getElementById('btn-check-puzzle').disabled = true;
+            updateProgressBar();
+        }
+
+        // Act 8: Sentences
+        function generateAct8() {
+            const container = document.getElementById('act8-container');
+            for(let i=1; i<=12; i++) {
+                container.innerHTML += `
+                    <div>
+                        <label class="block mb-1 text-sm font-semibold">Sentence ${i}:</label>
+                        <textarea rows="2" class="w-full p-2 rounded-lg bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 shiny-blue act8-input text-sm"></textarea>
+                    </div>
+                `;
+            }
+        }
+
+        function checkAct8() {
+            if(scores.act8.completed) return;
+            const inputs = document.querySelectorAll('.act8-input');
+            let filled = 0;
+            inputs.forEach(input => {
+                if(input.value.trim().split(' ').length > 4) filled++; // simple length check
+                input.readOnly = true;
+                input.classList.remove('shiny-blue');
+            });
+            scores.act8.score = filled;
+            scores.act8.completed = true;
+            
+            const fb = document.getElementById('act8-feedback');
+            fb.textContent = `Saved! You wrote ${filled}/12 valid sentences.`;
+            fb.classList.remove('hidden');
+            fb.classList.add('text-blue-600', 'dark:text-blue-400');
+            lockContainer('act8-container', event.target);
+            updateProgressBar();
+        }
+
+        // --- Final Submission and Charts ---
+        let chartsInstance = [];
+
+        function submitWorksheet() {
+            const name = document.getElementById('student-name').value.trim();
+            const date = document.getElementById('student-date').value;
+            
+            if(!name) {
+                alert("Please enter your name at the top of the worksheet before submitting.");
+                window.scrollTo({top:0, behavior:'smooth'});
+                document.getElementById('student-name').focus();
+                return;
+            }
+
+            // Auto-check any uncompleted sections (gives 0 or partial for uncompleted)
+            if(!scores.act1.completed) checkAct1();
+            if(!scores.act2.completed) checkAct2();
+            if(!scores.act3.completed) checkAct3();
+            if(!scores.act4.completed) checkAct4();
+            if(!scores.act5.completed) checkAct5();
+            if(!scores.act6.completed) checkAct6();
+            if(!scores.act7.completed && puzzleActive) checkAct7(); // only check if active
+            if(!scores.act8.completed) checkAct8();
+            
+            // Navigate to results page
+            currentSection = 9;
+            const sections = document.querySelectorAll('.activity-section');
+            sections.forEach(s => {
+                s.classList.add('hidden');
+                s.classList.remove('active');
+            });
+            sections[9].classList.remove('hidden');
+            sections[9].classList.add('active');
+            
+            updateNavigation();
+            window.scrollTo({top: 0, behavior: 'smooth'});
+            renderResults();
+        }
+
+        function renderResults() {
+            // Calculate totals
+            let totalPointsEarned = 0;
+            let maxTotalPoints = 0;
+            let completionCount = 0;
+            
+            for(let key in scores) {
+                totalPointsEarned += scores[key].score;
+                maxTotalPoints += scores[key].total;
+                if(scores[key].score > 0 || scores[key].completed) completionCount++; // simplified completion metric
+            }
+            
+            let finalPercentage = Math.round((totalPointsEarned / maxTotalPoints) * 100);
+            
+            // Update UI
+            document.getElementById('final-score').textContent = `${finalPercentage}%`;
+            
+            const feedbackText = document.getElementById('final-feedback-text');
+            if(finalPercentage > 85) {
+                feedbackText.textContent = "Outstanding work! You have a solid grasp of gerunds and infinitives.";
+            } else if(finalPercentage > 60) {
+                feedbackText.textContent = "Good effort! Review the rules for verbs followed by both to improve.";
+            } else {
+                feedbackText.textContent = "Keep practicing. Make sure to review the grammar guide in Activity 4.";
+            }
+
+            // Generate Recommendations based on performance
+            generateRecommendations(finalPercentage);
+
+            // Render Charts
+            renderCharts();
+        }
+
+        function generateRecommendations(overallScore) {
+            const list = document.getElementById('recommendations-list');
+            list.innerHTML = '';
+            const recs = [];
+            
+            // Generic rules for recs based on scores
+            if(scores.act4.score < 12) recs.push("Review the list of verbs that specifically take gerunds (e.g., enjoy, avoid).");
+            if(scores.act4.score < 10) recs.push("Memorize the verbs that take infinitives (e.g., decide, plan, hope).");
+            if(scores.act5.score < 8) recs.push("Practice reading B2 level texts to see gerunds and infinitives in context.");
+            if(scores.act5.score < 11) recs.push("Pay attention to context clues when completing reading comprehension exercises.");
+            if(scores.act1.score < 5 || scores.act8.score < 12) recs.push("Write more complex sentences daily to make using these forms a habit.");
+            if(scores.act2.score == 0 || scores.act6.score == 0) recs.push("Listen to English podcasts or videos and write down sentences you hear containing gerunds.");
+            
+            // Fill rest to ensure exactly 8
+            const fillerRecs = [
+                "Remember that prepositions are almost always followed by gerunds.",
+                "Practice verbs that can take both forms without a change in meaning (like, love, start).",
+                "Review verbs that change meaning depending on the form (e.g., stop smoking vs. stop to smoke).",
+                "Try explaining the grammar rules to a classmate to reinforce your own understanding.",
+                "Use flashcards to test yourself on verb + gerund vs verb + infinitive pairings.",
+                "Read English articles focusing purely on identifying verbs and their complements.",
+                "When speaking, slow down slightly to choose the correct verb form consciously."
+            ];
+            
+            let i = 0;
+            while(recs.length < 8) {
+                if(!recs.includes(fillerRecs[i])) recs.push(fillerRecs[i]);
+                i++;
+            }
+
+            recs.forEach(r => {
+                list.innerHTML += `<li>${r}</li>`;
+            });
+        }
+
+        function renderCharts() {
+            // Destroy existing charts if any
+            chartsInstance.forEach(c => c.destroy());
+            chartsInstance = [];
+
+            const isDark = document.documentElement.classList.contains('dark');
+            const textColor = isDark ? '#f3f4f6' : '#1f2937';
+            const gridColor = isDark ? '#374151' : '#e5e7eb';
+
+            Chart.defaults.color = textColor;
+
+            // Pie Chart - Completion
+            const ctxPie = document.getElementById('chart-pie').getContext('2d');
+            let completed = 0, uncompleted = 0;
+            for(let key in scores) { if(scores[key].completed) completed++; else uncompleted++; }
+
+            const pieChart = new Chart(ctxPie, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Completed Activities', 'Incomplete'],
+                    datasets: [{
+                        data: [completed, uncompleted],
+                        backgroundColor: ['#3b82f6', '#ef4444'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { position: 'bottom' } }
+                }
+            });
+            chartsInstance.push(pieChart);
+
+            // Bar Chart - Scores
+            const ctxBar = document.getElementById('chart-bar').getContext('2d');
+            const labels = ['Act 1', 'Act 4 (Cloze)', 'Act 5 (Reading)', 'Act 7 (Puzzle)', 'Act 8 (Sentences)'];
+            const dataScores = [
+                (scores.act1.score/scores.act1.total)*100 || 0,
+                (scores.act4.score/scores.act4.total)*100 || 0,
+                (scores.act5.score/scores.act5.total)*100 || 0,
+                (scores.act7.score/scores.act7.total)*100 || 0,
+                (scores.act8.score/scores.act8.total)*100 || 0
+            ];
+
+            const barChart = new Chart(ctxBar, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Score Percentage',
+                        data: dataScores,
+                        backgroundColor: [
+                            'rgba(255, 99, 132, 0.7)',
+                            'rgba(54, 162, 235, 0.7)',
+                            'rgba(255, 206, 86, 0.7)',
+                            'rgba(75, 192, 192, 0.7)',
+                            'rgba(153, 102, 255, 0.7)'
+                        ],
+                        borderColor: [
+                            'rgba(255, 99, 132, 1)',
+                            'rgba(54, 162, 235, 1)',
+                            'rgba(255, 206, 86, 1)',
+                            'rgba(75, 192, 192, 1)',
+                            'rgba(153, 102, 255, 1)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: { 
+                            beginAtZero: true, 
+                            max: 100,
+                            grid: { color: gridColor }
+                        },
+                        x: {
+                            grid: { display: false }
+                        }
+                    },
+                    plugins: { legend: { display: false } }
+                }
+            });
+            chartsInstance.push(barChart);
+        }
+
+        function updateChartsTheme() {
+            if(currentSection === 9) {
+                renderCharts(); // Re-render to pick up dark/light mode text colors
+            }
+        }
+
+        function printResults() {
+            window.scrollTo({top: 0, behavior: 'instant'});
+            setTimeout(() => {
+                window.print();
+            }, 500);
+        }
+
+    </script>
+</body>
+</html>
